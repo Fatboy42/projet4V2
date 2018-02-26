@@ -1,0 +1,162 @@
+
+{% extends 'MLFrontBundle:layout:layout.html.twig' %}
+
+{% block title %}{{ parent() }} - Reservation{% endblock %}
+
+ {% block body %}
+
+
+
+ {% for flashMessage in app.session.flashbag.get('alert') %}
+
+ <div class="alert alert-danger" role="alert">
+   {{ flashMessage }}
+ </div>
+
+ {% endfor %}
+
+ <h1 class="cover-heading">Reservation</h1>
+ <p class="lead">
+
+{{ form_start(form, {'attr': {'class': 'form-horizontal'}}) }}
+
+{{ form_errors(form) }}
+
+{{ form_row(form.firstname) }} {# Generation automatique du champ du formulaire (label, erreurs, widget)#}
+
+{{ form_row(form.lastname) }}
+
+{{ form_row(form.reservationtype) }}
+
+{# {{ form_row(form.dateform) }} #}
+
+{{ form_label(form.dateform) }}
+{{ form_errors(form.dateform) }}
+{{ form_widget(form.dateform) }}
+
+
+
+
+{{ form_row(form.mail) }}
+
+<a href="#" id="add_ticket" class="btn btn-success">Ajouter</a>
+{{ form_row(form.tickets) }}
+
+{#<div id="collectionContainer" data-prototype="{ % filter escape % } {{ include('MLFrontBundle:layout:prototype.html.twig', { 'form': form.tickets.vars.prototype }) }}">
+
+</div>#}
+
+
+{{ form_widget(form.save, {'attr': {'class': 'btn btn-primary'}}) }}
+
+{{ form_rest(form) }}
+
+{{ form_end(form) }}
+
+
+ </p>
+
+{% block javascript %}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+ <script type="text/javascript">
+
+
+$(document).ready(function()
+{
+  $(function() {
+    $( "#ml_frontbundle_reservation_dateform" ).datepicker({
+      changeMonth: true,
+      changeYear: true,
+      dateFormat: "dd/mm/yy",
+      altFormat: "dd/mm/yy",
+      minDate: new Date()
+    });
+  });
+
+
+
+  var $container = $('div#ml_frontbundle_reservation_tickets');
+
+  var index = $container.find(':input').length;
+
+  $('#add_ticket').click(function(e){
+    addTicket($container);
+
+    e.preventDefault();
+    return false;
+  });
+
+  if (index == 0)
+  {
+    addTicket($container);
+  }
+  else
+  {
+    $container.children('div').each(function(){
+      addDeleteLink($(this));
+      $(function() {
+        $( ".mydateclass" ).datepicker({
+          changeMonth: true,
+          changeYear: true,
+          altFormat: "dd/mm/yy",
+          dateFormat: "dd/mm/yy",
+          minDate: new Date(1900, 1, 1),
+          maxDate: new Date()
+        });
+      });
+    });
+  }
+
+  function addTicket($container)
+  {
+    var template = $container.attr('data-prototype')
+      .replace(/__name__label__/g, 'Ticket n°' + (index+1))
+      .replace(/__name__/g, index)
+      ;
+
+    var $prototype = $(template);
+
+    addDeleteLink($prototype);
+
+    $container.append($prototype);
+
+    $(function() {
+      $( ".mydateclass" ).datepicker({
+        changeMonth: true,
+        changeYear: true,
+        altFormat: "dd/mm/yy",
+        dateFormat: "dd/mm/yy",
+        minDate: new Date(1900, 1, 1),
+        maxDate: new Date()
+      });
+    });
+
+    index++;
+  }
+
+
+  function addDeleteLink($prototype)
+  {
+    var $deleteLink = $('<a href="#" class="btn btn-danger">Supprimer</a>');
+
+    $prototype.append($deleteLink);
+
+    $deleteLink.click(function(e){
+      $prototype.remove();
+
+      e.preventDefault();
+
+      return false;
+    });
+  }
+
+});
+
+
+ </script>
+
+{% endblock %}
+
+ {% endblock %}
